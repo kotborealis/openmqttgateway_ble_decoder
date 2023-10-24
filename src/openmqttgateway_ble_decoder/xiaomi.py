@@ -617,7 +617,7 @@ def obj1019(xobj):
     else:
         opening = 0
         status = None
-    return {"opening": opening, "status": status, "device_kind": "door_sensor"}
+    return {"opening": opening, "status": status}
 
 
 def obj101b(xobj):

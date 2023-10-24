@@ -11,10 +11,17 @@ It expects OpenMqttGateway device to run [my modified firmware](https://github.c
 
 Publishes decoded packets into `home/mqttgateway_ble_decoder/{{MAC_WITHOUT_:}}` topic.
 
-## Configuration
+## Usage
 
-Configured by env vars:
+```
+Usage: openmqttgateway_ble_decoder [OPTIONS]
 
-* `OMG_BD_KEYS`: pairs of mac adresses and decryption keys in format `MAC=key;MAC2=key2;`.
-* `OMG_BD_MQTT_IP`: ip of mqtt server.
-* `OMG_BD_MQTT_PORT`: port of mqtt server.
+Options:
+  --mqtt TEXT               MQTT server ip  [required]
+  --mqtt-port INTEGER       MQTT server port
+  --mqtt-keepalive INTEGER  MQTT connection keepalive param
+  --mqtt-username TEXT      MQTT username
+  --mqtt-password TEXT      MQTT password
+  --device <TEXT TEXT>...   Macs and decryption keys  [required]
+  --help                    Show this message and exit.
+```
