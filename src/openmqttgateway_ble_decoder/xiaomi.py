@@ -1,4 +1,3 @@
-
 """
 Parser for Xiaomi MiBeacon BLE advertisements
 """
@@ -37,11 +36,11 @@ XIAOMI_TYPE_DICT = {
     0x2AEB: "HS1BB(MI)",
     0x01AA: "LYWSDCGQ",
     0x045B: "LYWSD02",
-    0x16e4: "LYWSD02MMC",
+    0x16E4: "LYWSD02MMC",
     0x2542: "LYWSD02MMC",
     0x055B: "LYWSD03MMC",
     0x098B: "MCCGQ02HL",
-    0x06d3: "MHO-C303",
+    0x06D3: "MHO-C303",
     0x0387: "MHO-C401",
     0x07F6: "MJYD02YL",
     0x04E9: "MJZNMSQ01YD",
@@ -146,7 +145,7 @@ BLE_LOCK_METHOD = {
     0b1000: "coercion",
     0b1010: "manual",
     0b1011: "automatic",
-    0b1111: "abnormal"
+    0b1111: "abnormal",
 }
 
 
@@ -162,12 +161,12 @@ def obj0006(xobj):
     if len(xobj) == 5:
         key_id = xobj[0:4]
         match_byte = xobj[4]
-        if key_id == b'\x00\x00\x00\x00':
+        if key_id == b"\x00\x00\x00\x00":
             key_id = "administrator"
-        elif key_id == b'\xff\xff\xff\xff':
+        elif key_id == b"\xff\xff\xff\xff":
             key_id = "unknown operator"
         else:
-            key_id = int.from_bytes(key_id, 'little')
+            key_id = int.from_bytes(key_id, "little")
         if match_byte == 0x00:
             result = "match successful"
         elif match_byte == 0x01:
@@ -226,17 +225,17 @@ def obj0008(xobj, device_type):
     """armed away"""
     return_data = {}
     value = xobj[0] ^ 1
-    return_data.update({'armed away': value})
+    return_data.update({"armed away": value})
     if len(xobj) == 5:
-        timestamp = int.from_bytes(xobj[1:], 'little')
+        timestamp = int.from_bytes(xobj[1:], "little")
         timestamp = timestamp
-        return_data.update({'timestamp': timestamp})
+        return_data.update({"timestamp": timestamp})
     # Lift up door handle outside the door sends this event from DSL-C08.
     if device_type == "DSL-C08":
         return {
             "lock": value,
-            "locktype": 'lock',
-            "action": 'lock outside the door',
+            "locktype": "lock",
+            "action": "lock outside the door",
             "method": "manual",
             "error": None,
             "key id": None,
@@ -249,14 +248,14 @@ def obj0010(xobj):
     """Toothbrush"""
     if xobj[0] == 0:
         if len(xobj) == 1:
-            return {'toothbrush': 1}
+            return {"toothbrush": 1}
         else:
-            return {'toothbrush': 1, 'counter': xobj[1]}
+            return {"toothbrush": 1, "counter": xobj[1]}
     else:
         if len(xobj) == 1:
-            return {'toothbrush': 0}
+            return {"toothbrush": 0}
         else:
-            return {'toothbrush': 0, 'score': xobj[1]}
+            return {"toothbrush": 0, "score": xobj[1]}
 
 
 def obj000a(xobj):
@@ -276,8 +275,8 @@ def obj000b(xobj, device_type):
     if len(xobj) == 9:
         action = xobj[0] & 0x0F
         method = xobj[0] >> 4
-        key_id = int.from_bytes(xobj[1:5], 'little')
-        timestamp = int.from_bytes(xobj[5:], 'little')
+        key_id = int.from_bytes(xobj[1:5], "little")
+        timestamp = int.from_bytes(xobj[5:], "little")
 
         timestamp = timestamp
 
@@ -321,7 +320,7 @@ def obj000b(xobj, device_type):
 def obj000f(xobj, device_type):
     """Moving with light"""
     if len(xobj) == 3:
-        (value,) = LIGHT_STRUCT.unpack(xobj + b'\x00')
+        (value,) = LIGHT_STRUCT.unpack(xobj + b"\x00")
 
         if device_type in ["MJYD02YL", "RTCGQ02LM"]:
             # MJYD02YL:  1 - moving no light, 100 - moving with light
@@ -329,7 +328,12 @@ def obj000f(xobj, device_type):
             return {"motion": 1, "motion timer": 1, "light": int(value >= 100)}
         elif device_type == "CGPR1":
             # CGPR1:     moving, value is illumination in lux
-            return {"motion": 1, "motion timer": 1, "illuminance": value, "light": int(value >= 100)}
+            return {
+                "motion": 1,
+                "motion timer": 1,
+                "illuminance": value,
+                "light": int(value >= 100),
+            }
         else:
             return {}
     else:
@@ -534,7 +538,7 @@ def obj1006(xobj):
 def obj1007(xobj):
     """Illuminance"""
     if len(xobj) == 3:
-        (illum,) = ILL_STRUCT.unpack(xobj + b'\x00')
+        (illum,) = ILL_STRUCT.unpack(xobj + b"\x00")
         return {"illuminance": illum, "light": 1 if illum == 100 else 0}
     else:
         return {}
@@ -589,7 +593,10 @@ def obj1017(xobj):
         (no_motion_time,) = M_STRUCT.unpack(xobj)
         # seconds since last motion detected message (not used, we use motion timer in obj000f)
         # 0 = motion detected
-        return {"motion": 1 if no_motion_time == 0 else 0, "no motion time": no_motion_time}
+        return {
+            "motion": 1 if no_motion_time == 0 else 0,
+            "no motion time": no_motion_time,
+        }
     else:
         return {}
 
@@ -626,7 +633,10 @@ def obj101b(xobj):
         (no_motion_time,) = M_STRUCT.unpack(xobj)
         # seconds since last motion detected message (not used, we use motion timer in obj000f)
         # 0 = motion detected
-        return {"motion": 1 if no_motion_time == 0 else 0, "no motion time": no_motion_time}
+        return {
+            "motion": 1 if no_motion_time == 0 else 0,
+            "no motion time": no_motion_time,
+        }
     else:
         return {}
 
@@ -653,7 +663,7 @@ def obj100e(xobj, device_type):
     if len(xobj) == 1:
         # Unlock by type on some devices
         if device_type == "DSL-C08":
-            lock_attribute = int.from_bytes(xobj, 'little')
+            lock_attribute = int.from_bytes(xobj, "little")
             lock = lock_attribute & 0x01 ^ 1
             childlock = lock_attribute >> 3 ^ 1
             return {"childlock": childlock, "lock": lock}
@@ -666,9 +676,9 @@ def obj2000(xobj):
         # Body temperature is calculated from the two measured temperatures.
         # Formula is based on approximation based on values in the app in the range 36.5 - 37.8.
         body_temp = (
-            3.71934 * pow(10, -11) * math.exp(0.69314 * temp1 / 100) - (
-                1.02801 * pow(10, -8) * math.exp(0.53871 * temp2 / 100)
-            ) + 36.413
+            3.71934 * pow(10, -11) * math.exp(0.69314 * temp1 / 100)
+            - (1.02801 * pow(10, -8) * math.exp(0.53871 * temp2 / 100))
+            + 36.413
         )
         return {"temperature": body_temp, "battery": bat}
     else:
@@ -682,12 +692,12 @@ def obj3003(xobj):
     if start_obj == 0:
         # Start of brushing
         result["toothbrush"] = 1
-        start_time = struct.unpack('<L', xobj[1:5])[0]
+        start_time = struct.unpack("<L", xobj[1:5])[0]
         result["start time"] = start_time
     elif start_obj == 1:
         # End of brushing
         result["toothbrush"] = 0
-        end_time = struct.unpack('<L', xobj[1:5])[0]
+        end_time = struct.unpack("<L", xobj[1:5])[0]
         result["end time"] = end_time
 
     if len(xobj) == 6:
@@ -747,7 +757,10 @@ def obj4818(xobj):
         (no_motion_time,) = struct.unpack("<H", xobj)
         # seconds since last motion detected message (not used, we use motion timer in obj4a08)
         # 0 = motion detected
-        return {"motion": 1 if no_motion_time == 0 else 0, "no motion time": no_motion_time}
+        return {
+            "motion": 1 if no_motion_time == 0 else 0,
+            "no motion time": no_motion_time,
+        }
     else:
         return {}
 
@@ -768,10 +781,7 @@ def obj4a0f(xobj):
     """Door/window broken open"""
     dev_forced = xobj[0]
     if dev_forced == 1:
-        return {
-            "opening": 1,
-            "status": "door/window broken open"
-        }
+        return {"opening": 1, "status": "door/window broken open"}
     else:
         return {}
 
@@ -801,9 +811,7 @@ def obj4a13(xobj):
 def obj4a1a(xobj):
     """Door Not Closed"""
     if xobj[0] == 1:
-        return {
-            "opening": 1,
-            "status": "door not closed"}
+        return {"opening": 1, "status": "door not closed"}
     else:
         return {}
 
@@ -1056,28 +1064,28 @@ xiaomi_dataobject_dict = {
     0x4810: obj4810,
     0x4811: obj4811,
     0x4818: obj4818,
-    0x4a01: obj4a01,
-    0x4a08: obj4a08,
-    0x4a0f: obj4a0f,
-    0x4a12: obj4a12,
-    0x4a13: obj4a13,
-    0x4a1a: obj4a1a,
-    0x4c01: obj4c01,
-    0x4c02: obj4c02,
-    0x4c03: obj4c03,
-    0x4c08: obj4c08,
-    0x4c14: obj4c14,
-    0x4e0c: obj4e0c,
-    0x4e0d: obj4e0d,
-    0x4e0e: obj4e0e,
-    0x4e16: obj4e16,
-    0x4e17: obj4e17,
-    0x4e1c: obj4e1c,
+    0x4A01: obj4a01,
+    0x4A08: obj4a08,
+    0x4A0F: obj4a0f,
+    0x4A12: obj4a12,
+    0x4A13: obj4a13,
+    0x4A1A: obj4a1a,
+    0x4C01: obj4c01,
+    0x4C02: obj4c02,
+    0x4C03: obj4c03,
+    0x4C08: obj4c08,
+    0x4C14: obj4c14,
+    0x4E0C: obj4e0c,
+    0x4E0D: obj4e0d,
+    0x4E0E: obj4e0e,
+    0x4E16: obj4e16,
+    0x4E17: obj4e17,
+    0x4E1C: obj4e1c,
     0x5010: obj5010,
     0x5011: obj5011,
     0x5403: obj5403,
     0x5601: obj5601,
-    0x5a16: obj5a16,
+    0x5A16: obj5a16,
 }
 
 
@@ -1105,12 +1113,18 @@ def parse_xiaomi(self, data, source_mac, rssi):
 
     # Check that device is not of mesh type
     if frctrl_mesh != 0 and False:
-        _LOGGER.debug("Xiaomi device data is a mesh type device, which is not supported. Data: %s", data.hex())
+        _LOGGER.debug(
+            "Xiaomi device data is a mesh type device, which is not supported. Data: %s",
+            data.hex(),
+        )
         return None
 
     # Check that version is 2 or higher
     if frctrl_version < 2:
-        _LOGGER.debug("Xiaomi device data is using old data format, which is not supported. Data: %s", data.hex())
+        _LOGGER.debug(
+            "Xiaomi device data is using old data format, which is not supported. Data: %s",
+            data.hex(),
+        )
         return None
 
     OFFSET = 0
@@ -1120,16 +1134,18 @@ def parse_xiaomi(self, data, source_mac, rssi):
         if msg_length < i:
             _LOGGER.debug("Invalid data length (in MAC check), adv: %s", data.hex())
             return None
-        xiaomi_mac_reversed = data[9+OFFSET:15+OFFSET]
+        xiaomi_mac_reversed = data[9 + OFFSET : 15 + OFFSET]
         xiaomi_mac = xiaomi_mac_reversed[::-1]
         if xiaomi_mac != source_mac:
-            _LOGGER.debug("Xiaomi MAC address doesn't match data MAC address. Data: %s", data.hex())
+            _LOGGER.debug(
+                "Xiaomi MAC address doesn't match data MAC address. Data: %s", data.hex()
+            )
             return None
     else:
         xiaomi_mac = source_mac
 
     # determine the device type
-    device_id = data[6+OFFSET] + (data[7+OFFSET] << 8)
+    device_id = data[6 + OFFSET] + (data[7 + OFFSET] << 8)
     try:
         device_type = XIAOMI_TYPE_DICT[device_id]
     except KeyError:
@@ -1138,27 +1154,29 @@ def parse_xiaomi(self, data, source_mac, rssi):
 
     packet_id = data[8]
 
-    sinfo = 'MiVer: ' + str(frctrl_version)
-    sinfo += ', DevID: ' + hex(device_id) + ' : ' + device_type
-    sinfo += ', FnCnt: ' + str(packet_id)
+    sinfo = "MiVer: " + str(frctrl_version)
+    sinfo += ", DevID: " + hex(device_id) + " : " + device_type
+    sinfo += ", FnCnt: " + str(packet_id)
     if frctrl_request_timing != 0:
-        sinfo += ', Request timing'
+        sinfo += ", Request timing"
     if frctrl_registered != 0:
-        sinfo += ', Registered and bound'
+        sinfo += ", Registered and bound"
     else:
-        sinfo += ', Not bound'
+        sinfo += ", Not bound"
     if frctrl_solicited != 0:
-        sinfo += ', Request APP to register and bind'
+        sinfo += ", Request APP to register and bind"
     if frctrl_auth_mode == 0:
-        sinfo += ', Old version certification'
+        sinfo += ", Old version certification"
     elif frctrl_auth_mode == 1:
-        sinfo += ', Safety certification'
+        sinfo += ", Safety certification"
     elif frctrl_auth_mode == 2:
-        sinfo += ', Standard certification'
+        sinfo += ", Standard certification"
 
     # check for MAC presence in sensor whitelist, if needed
     if self.discovery is False and xiaomi_mac not in self.sensor_whitelist:
-        _LOGGER.debug("Discovery is disabled. MAC: %s is not whitelisted!", to_mac(xiaomi_mac))
+        _LOGGER.debug(
+            "Discovery is disabled. MAC: %s is not whitelisted!", to_mac(xiaomi_mac)
+        )
         return None
 
     # check for unique packet_id and advertisement priority
@@ -1204,34 +1222,40 @@ def parse_xiaomi(self, data, source_mac, rssi):
     if frctrl_capability_include != 0:
         i += 1
         if msg_length < i:
-            _LOGGER.debug("Invalid data length (in capability check), adv: %s", data.hex())
+            _LOGGER.debug(
+                "Invalid data length (in capability check), adv: %s", data.hex()
+            )
             return None
         capability_types = data[i - 1]
-        sinfo += ', Capability: ' + hex(capability_types)
+        sinfo += ", Capability: " + hex(capability_types)
         if (capability_types & 0x20) != 0:
             i += 1
             if msg_length < i:
-                _LOGGER.debug("Invalid data length (in capability type check), adv: %s", data.hex())
+                _LOGGER.debug(
+                    "Invalid data length (in capability type check), adv: %s", data.hex()
+                )
                 return None
             capability_io = data[i - 1]
-            sinfo += ', IO: ' + hex(capability_io)
+            sinfo += ", IO: " + hex(capability_io)
 
     # check that data contains object
     if frctrl_object_include != 0:
         # check for encryption
         if frctrl_is_encrypted != 0:
-            sinfo += ', Encryption'
+            sinfo += ", Encryption"
             firmware = "Xiaomi (MiBeacon V" + str(frctrl_version) + " encrypted)"
             if frctrl_version <= 3:
                 payload = decrypt_mibeacon_legacy(self, data, i, xiaomi_mac)
             else:
                 payload = decrypt_mibeacon_v4_v5(self, data, i, xiaomi_mac)
-        else:   # No encryption
+        else:  # No encryption
             # check minimum advertisement length with data
             firmware = "Xiaomi (MiBeacon V" + str(frctrl_version) + ")"
-            sinfo += ', No encryption'
+            sinfo += ", No encryption"
             if msg_length < i + 3:
-                _LOGGER.debug("Invalid data length (in non-encrypted data), adv: %s", data.hex())
+                _LOGGER.debug(
+                    "Invalid data length (in non-encrypted data), adv: %s", data.hex()
+                )
                 return None
             payload = data[i:]
     else:
@@ -1250,7 +1274,7 @@ def parse_xiaomi(self, data, source_mac, rssi):
 
     if payload is not None:
         result.update({"data": True})
-        sinfo += ', Object data: ' + payload.hex()
+        sinfo += ", Object data: " + payload.hex()
         # loop through parse_xiaomi payload
         payload_start = 0
         payload_length = len(payload)
@@ -1262,17 +1286,30 @@ def parse_xiaomi(self, data, source_mac, rssi):
             if payload_length < next_start:
                 _LOGGER.debug("Invalid payload data length, payload: %s", payload.hex())
                 break
-            dobject = payload[payload_start + 3:next_start]
+            dobject = payload[payload_start + 3 : next_start]
             if dobject and obj_length != 0:
                 resfunc = xiaomi_dataobject_dict.get(obj_typecode, None)
                 if resfunc:
-                    if hex(obj_typecode) in ["0x8", "0x100e", "0x1001", "0xf", "0xb", "0x4e0c", "0x4e0d", "0x4e0e"]:
+                    if hex(obj_typecode) in [
+                        "0x8",
+                        "0x100e",
+                        "0x1001",
+                        "0xf",
+                        "0xb",
+                        "0x4e0c",
+                        "0x4e0d",
+                        "0x4e0e",
+                    ]:
                         result.update(resfunc(dobject, device_type))
                     else:
                         result.update(resfunc(dobject))
                 else:
                     if self.report_unknown == "Xiaomi":
-                        _LOGGER.info("%s, UNKNOWN dataobject in payload! Adv: %s", sinfo, data.hex())
+                        _LOGGER.info(
+                            "%s, UNKNOWN dataobject in payload! Adv: %s",
+                            sinfo,
+                            data.hex(),
+                        )
             payload_start = next_start
 
     return result
@@ -1292,7 +1329,9 @@ def decrypt_mibeacon_v4_v5(self, data, i, xiaomi_mac):
     except KeyError:
         # no encryption key found
         if xiaomi_mac not in self.no_key_message:
-            _LOGGER.error("No encryption key found for device with MAC %s", to_mac(xiaomi_mac))
+            _LOGGER.error(
+                "No encryption key found for device with MAC %s", to_mac(xiaomi_mac)
+            )
             self.no_key_message.append(xiaomi_mac)
         return None
 
@@ -1334,7 +1373,9 @@ def decrypt_mibeacon_legacy(self, data, i, xiaomi_mac):
         key = b"".join([aeskey[0:6], bytes.fromhex("8d3d3c97"), aeskey[6:]])
     except KeyError:
         # no encryption key found
-        _LOGGER.error("No encryption key found for device with MAC %s", to_mac(xiaomi_mac))
+        _LOGGER.error(
+            "No encryption key found for device with MAC %s", to_mac(xiaomi_mac)
+        )
         return None
 
     nonce = b"".join([data[4:9], data[-4:-1], xiaomi_mac[::-1][:-1]])

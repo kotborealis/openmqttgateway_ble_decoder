@@ -1,4 +1,3 @@
-
 """Parser for passive BLE advertisements."""
 import logging
 from typing import Optional
@@ -11,6 +10,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class BleParser:
     """Parser for BLE advertisements"""
+
     def __init__(
         self,
         report_unknown=False,
@@ -19,7 +19,7 @@ class BleParser:
         sensor_whitelist=None,
         tracker_whitelist=None,
         report_unknown_whitelist=None,
-        aeskeys=None
+        aeskeys=None,
     ):
         self.report_unknown = report_unknown
         self.discovery = discovery
@@ -47,14 +47,14 @@ class BleParser:
         self.no_key_message = []
 
     def parse_advertisement(
-            self,
-            mac: bytes,
-            rssi: int,
-            service_class_uuid16: Optional[int] = None,
-            service_class_uuid128: Optional[bytes] = None,
-            local_name: Optional[str] = "",
-            service_data_list: Optional[list] = None,
-            man_spec_data_list: Optional[list] = None
+        self,
+        mac: bytes,
+        rssi: int,
+        service_class_uuid16: Optional[int] = None,
+        service_class_uuid128: Optional[bytes] = None,
+        local_name: Optional[str] = "",
+        service_data_list: Optional[list] = None,
+        man_spec_data_list: Optional[list] = None,
     ):
         """parse BLE advertisement"""
         sensor_data = None
@@ -99,7 +99,11 @@ class BleParser:
             break
 
         # check for monitored device trackers
-        tracker_id = tracker_data['tracker_id'] if tracker_data and 'tracker_id' in tracker_data else mac
+        tracker_id = (
+            tracker_data["tracker_id"]
+            if tracker_data and "tracker_id" in tracker_data
+            else mac
+        )
         if tracker_id in self.tracker_whitelist:
             if tracker_data is not None:
                 tracker_data.update({"is connected": True})
@@ -126,7 +130,7 @@ class BleParser:
                     man_spec_data_list,
                     local_name,
                     service_class_uuid16,
-                    service_class_uuid128
+                    service_class_uuid128,
                 )
 
         return sensor_data, tracker_data

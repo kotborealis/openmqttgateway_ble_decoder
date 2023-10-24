@@ -24,19 +24,20 @@ from openmqttgateway_ble_decoder.helpers import to_mac
 
 _LOGGER = logging.getLogger(__name__)
 
+
 def parse(keys, mac, data, uuid):
-    mac = bytes.fromhex(mac.replace(':', ''))
+    mac = bytes.fromhex(mac.replace(":", ""))
     data = bytes.fromhex(uuid[2:] + "0000" + data)
 
     ble = BleParser(aeskeys=keys)
     return ble.parse_advertisement(
-                mac=mac,
-                rssi=-67,
-                service_class_uuid16=int(uuid[2:],16),
-                service_class_uuid128=None,
-                local_name="",
-                service_data_list=[data]
-                )
+        mac=mac,
+        rssi=-67,
+        service_class_uuid16=int(uuid[2:], 16),
+        service_class_uuid128=None,
+        local_name="",
+        service_data_list=[data],
+    )
 
 
 def on_connect(keys):
@@ -44,12 +45,13 @@ def on_connect(keys):
         for mac in keys:
             _LOGGER.info("Listening for device %s", to_mac(mac))
             client.subscribe(f"home/OMG_ESP32_BLE/BTtoMQTT/undecoded/{to_mac(mac)}")
-    
+
     return handler
+
 
 def on_message(keys):
     def handler(client, userdata, msg):
-        payload = msg.payload.decode('utf-8')
+        payload = msg.payload.decode("utf-8")
         data = json.loads(payload)
         mac = data["id"]
 
@@ -59,10 +61,15 @@ def on_message(keys):
         res = parse(keys, mac, data["servicedata"], data["servicedatauuid"])
         if not res or not res[0]:
             return
-    
+
         _LOGGER.info("Parsed payload: %s", res)
-        
-        client.publish(f"home/mqttgateway_ble_decoder/{mac.replace(':', '')}", payload=json.dumps(res[0]), qos=0, retain=False)
+
+        client.publish(
+            f"home/mqttgateway_ble_decoder/{mac.replace(':', '')}",
+            payload=json.dumps(res[0]),
+            qos=0,
+            retain=False,
+        )
 
     def handler_with_errors(*args, **kwargs):
         try:
@@ -72,52 +79,53 @@ def on_message(keys):
 
     return handler_with_errors
 
+
 @click.command()
 @click.option(
-    "--mqtt", 
+    "--mqtt",
     required=True,
     type=str,
     help="MQTT server ip",
 )
 @click.option(
-    "--mqtt-port", 
+    "--mqtt-port",
     required=False,
     type=int,
     default=1883,
     help="MQTT server port",
 )
 @click.option(
-    "--mqtt-keepalive", 
+    "--mqtt-keepalive",
     required=False,
     type=int,
     default=60,
     help="MQTT connection keepalive param",
 )
 @click.option(
-    "--mqtt-username", 
+    "--mqtt-username",
     required=False,
     type=str,
     default=lambda: os.environ.get("OMG_BD_MQTT_USERNAME", None),
     help="MQTT username",
 )
 @click.option(
-    "--mqtt-password", 
+    "--mqtt-password",
     required=False,
     type=str,
     default=lambda: os.environ.get("OMG_BD_MQTT_PASSWORD", None),
     help="MQTT password",
 )
 @click.option(
-    "--device", 
+    "--device",
     required=True,
     type=(str, str),
     multiple=True,
-    help="Macs and decryption keys"
+    help="Macs and decryption keys",
 )
 def main(mqtt, mqtt_port, mqtt_keepalive, mqtt_username, mqtt_password, device):
     keys = {}
     for mac, key in device:
-        keys[bytes.fromhex(mac.replace(':', ''))] = bytes.fromhex(key)
+        keys[bytes.fromhex(mac.replace(":", ""))] = bytes.fromhex(key)
 
     client = mqttlib.Client()
 
@@ -131,6 +139,7 @@ def main(mqtt, mqtt_port, mqtt_keepalive, mqtt_username, mqtt_password, device):
     client.connect(mqtt, mqtt_port, mqtt_keepalive)
 
     client.loop_forever()
+
 
 if __name__ == "__main__":
     main()
