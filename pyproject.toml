@@ -1,0 +1,51 @@
+[tool.poetry]
+name = "openmqttgateway-ble-decoder"
+version = "0.1.0"
+description = ""
+authors = ["kotborealis <kotborealis@awooo.ru>"]
+license = "WTFPL"
+readme = "README.md"
+
+[tool.poetry.scripts]
+openmqttgateway_ble_decoder = "openmqttgateway_ble_decoder.main:main"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pycryptodome = "^3.19.0"
+paho-mqtt = "^1.6.1"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.10.1"
+mypy = "^1.6.1"
+ruff = "^0.1.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line_length = 90
+target_version = ['py310']
+
+[tool.ruff]
+exclude = [
+    ".venv",
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    "venv",
+]
+ignore = []
+line-length = 90
+select = [
+    "E",
+    "F",
+    "W",
+    "I001",
+]
+src = ["src", "tests"]
+
+[mypy]
+files = ["src"]
+strict_optional = true
