@@ -7,7 +7,7 @@ import struct
 
 from Crypto.Cipher import AES
 
-from openmqttgateway_ble_decoder.helpers import *
+from openmqttgateway_ble_decoder.helpers import to_mac, to_unformatted_mac
 
 logging.basicConfig(level=logging.DEBUG)
 _LOGGER = logging.getLogger(__name__)
@@ -591,7 +591,8 @@ def obj1017(xobj):
     """No motion"""
     if len(xobj) == 4:
         (no_motion_time,) = M_STRUCT.unpack(xobj)
-        # seconds since last motion detected message (not used, we use motion timer in obj000f)
+        # seconds since last motion detected message
+        # (not used, we use motion timer in obj000f)
         # 0 = motion detected
         return {
             "motion": 1 if no_motion_time == 0 else 0,
@@ -631,7 +632,8 @@ def obj101b(xobj):
     """Timeout no movement"""
     if len(xobj) == 4:
         (no_motion_time,) = M_STRUCT.unpack(xobj)
-        # seconds since last motion detected message (not used, we use motion timer in obj000f)
+        # seconds since last motion detected message
+        # (not used, we use motion timer in obj000f)
         # 0 = motion detected
         return {
             "motion": 1 if no_motion_time == 0 else 0,

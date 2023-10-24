@@ -1,6 +1,6 @@
 """
 This is a really quick and REALLY DIRTY implementation
-of custom decoder for OpenMqttGateway, specifically for 
+of custom decoder for OpenMqttGateway, specifically for
 Xiaomi BLE devices with encrypted packets.
 
 This was hacked together from a couple of different scripts
@@ -74,7 +74,7 @@ def on_message(keys):
     def handler_with_errors(*args, **kwargs):
         try:
             handler(*args, **kwargs)
-        except:
+        except Exception:
             _LOGGER.exception("Failed to handle message")
 
     return handler_with_errors

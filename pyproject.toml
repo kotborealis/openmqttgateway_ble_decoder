@@ -40,7 +40,7 @@ exclude = [
     "venv",
 ]
 ignore = []
-line-length = 90
+line-length = 150
 select = [
     "E",
     "F",
