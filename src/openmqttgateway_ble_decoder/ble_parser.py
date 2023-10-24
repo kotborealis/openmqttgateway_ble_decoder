@@ -58,7 +58,7 @@ class BleParser:
     ):
         """parse BLE advertisement"""
         sensor_data = None
-        tracker_data = None
+        tracker_data: Optional[dict] = None
         unknown_sensor = False
         if service_data_list is None:
             service_data_list = []
@@ -74,9 +74,6 @@ class BleParser:
                         # UUID16 = Xiaomi
                         sensor_data = parse_xiaomi(self, service_data, mac, rssi)
                         break
-                    if uuid16 == 0x181A:
-                        # UUID16 = Environmental Sensing (used by ATC or b-parasite)
-                        sensor_data = parse_atc(self, service_data, mac, rssi)
                     else:
                         unknown_sensor = True
             else:

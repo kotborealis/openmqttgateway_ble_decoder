@@ -270,6 +270,17 @@ files = [
 ]
 
 [[package]]
+name = "types-paho-mqtt"
+version = "1.6.0.7"
+description = "Typing stubs for paho-mqtt"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-paho-mqtt-1.6.0.7.tar.gz", hash = "sha256:fe34c68abc849cd96e1482138bbdf5f465de59629dd367cb3a2423dd9ca3220b"},
+    {file = "types_paho_mqtt-1.6.0.7-py3-none-any.whl", hash = "sha256:50313d93f63d777da391acaac0278d346cf9e4a2576d814989d6500bd0ca4a35"},
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.8.0"
 description = "Backported and Experimental Type Hints for Python 3.8+"
@@ -283,4 +294,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "8baac3eeec395c54847ee92790e288a01d81d306634764062d6a4c0190b3d7bf"
+content-hash = "cd5b75a7efdadcc3fe1ea12678b66af123b7c22c873bdf506cdca9db84e2e094"
