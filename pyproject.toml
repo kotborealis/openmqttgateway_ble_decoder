@@ -10,7 +10,7 @@ readme = "README.md"
 openmqttgateway_ble_decoder = "openmqttgateway_ble_decoder.main:main"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.6"
 pycryptodome = "^3.19.0"
 paho-mqtt = "^1.6.1"
 click = "^8.1.7"
