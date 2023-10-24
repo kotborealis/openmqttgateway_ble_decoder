@@ -1561,7 +1561,7 @@ def on_message(client, userdata, msg):
     data = json.loads(payload)
     mac = data["id"]
 
-    if not data["servicedata"]:
+    if not data.get("servicedata") or not data.get("servicedatauuid"):
         return
 
     res = parse(mac, data["servicedata"], data["servicedatauuid"])
