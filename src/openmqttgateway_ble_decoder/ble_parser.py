@@ -1,6 +1,6 @@
 """Parser for passive BLE advertisements."""
 import logging
-from typing import Optional
+from typing import Dict, Optional
 
 from openmqttgateway_ble_decoder.helpers import to_mac, to_unformatted_mac
 from openmqttgateway_ble_decoder.xiaomi import parse_xiaomi
@@ -58,7 +58,7 @@ class BleParser:
     ):
         """parse BLE advertisement"""
         sensor_data = None
-        tracker_data: Optional[dict] = None
+        tracker_data: Optional[Dict] = None
         unknown_sensor = False
         if service_data_list is None:
             service_data_list = []
