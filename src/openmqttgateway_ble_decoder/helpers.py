@@ -1,6 +1,7 @@
 """Helpers for bleparser"""
 from uuid import UUID
 
+
 def to_uuid(uuid: str) -> str:
     """Return formatted UUID"""
     return str(UUID(''.join(f'{i:02X}' for i in uuid)))

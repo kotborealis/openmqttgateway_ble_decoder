@@ -12,14 +12,15 @@ https://github.com/1technophile/OpenMQTTGateway/commit/49d81e9f5ce21cf5c3aa922a8
 Publishes decoded packets into `home/mqttgateway_ble_decoder/{{MAC_WITHOUT_:}}` topic
 """
 
-import click
-import logging
-import paho.mqtt.client as mqttlib
 import json
+import logging
 import os
 
-from openmqttgateway_ble_decoder.helpers import to_mac
+import click
+import paho.mqtt.client as mqttlib
+
 from openmqttgateway_ble_decoder.ble_parser import BleParser
+from openmqttgateway_ble_decoder.helpers import to_mac
 
 _LOGGER = logging.getLogger(__name__)
 
